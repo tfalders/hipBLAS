@@ -27,6 +27,7 @@ enable_language( Fortran )
 
 set(hipblas_bench_source client.cpp)
 
+find_package(hipsolver REQUIRED CONFIG PATHS /opt/rocm /opt/rocm/hipsolver /home/talderso/dev/hipSOLVER/build/release)
 if( NOT TARGET hipblas )
   find_package( hipblas REQUIRED CONFIG PATHS /opt/rocm/hipblas )
 endif( )
@@ -57,6 +58,8 @@ elseif(NOT WIN32)
   target_link_libraries( hipblas-bench PRIVATE blas )
 endif()
 
+target_link_libraries( hipblas-bench PRIVATE roc::hipsolver )
+
 # Internal header includes
 target_include_directories( hipblas-bench
   PRIVATE
@@ -81,7 +84,7 @@ target_link_libraries( hipblas-bench PRIVATE ${BLAS_LIBRARY} roc::hipblas Thread
 # need mf16c flag for float->half convertion
 target_compile_options( hipblas-bench PRIVATE -mf16c ) # -Wno-deprecated-declarations )
 
-target_compile_definitions( hipblas-bench PRIVATE HIPBLAS_BENCH HIPBLAS_BFLOAT16_CLASS ROCM_USE_FLOAT16 HIPBLAS_NO_DEPRECATED_WARNINGS)
+target_compile_definitions( hipblas-bench PRIVATE HIPBLAS_BENCH HIPBLAS_BFLOAT16_CLASS HIPBLAS_NO_DEPRECATED_WARNINGS)
 
 if( NOT USE_CUDA )
   target_link_libraries( hipblas-bench PRIVATE hip::host )

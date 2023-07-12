@@ -27,6 +27,7 @@ if(NOT WIN32)
     enable_language( Fortran )
 endif()
 
+find_package(hipsolver REQUIRED CONFIG PATHS /opt/rocm /opt/rocm/hipsolver /home/talderso/dev/hipSOLVER/build/release)
 if( NOT TARGET hipblas )
   find_package( hipblas REQUIRED CONFIG PATHS /opt/rocm/hipblas )
 endif( )
@@ -164,12 +165,14 @@ if (NOT WIN32)
     target_link_libraries( hipblas-test PRIVATE hipblas_fortran_client lapack cblas stdc++fs )
 endif()
 
+target_link_libraries( hipblas-test PRIVATE roc::hipsolver )
+
 target_link_libraries( hipblas-test PRIVATE ${BLAS_LIBRARY} roc::hipblas GTest::GTest Threads::Threads )
 
 # need mf16c flag for float->half convertion
 target_compile_options( hipblas-test PRIVATE -mf16c ) # -Wno-deprecated-declarations )
 
-target_compile_definitions( hipblas-test PRIVATE HIPBLAS_BFLOAT16_CLASS ROCM_USE_FLOAT16 HIPBLAS_NO_DEPRECATED_WARNINGS)
+target_compile_definitions( hipblas-test PRIVATE HIPBLAS_BFLOAT16_CLASS HIPBLAS_NO_DEPRECATED_WARNINGS)
 
 if( NOT USE_CUDA )
   target_link_libraries( hipblas-test PRIVATE hip::host )
